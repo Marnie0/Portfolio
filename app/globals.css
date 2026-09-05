@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens.
+ * Palette: warm "ink & cream" neutrals with a vermilion accent.
+ * The accent has separate `accent` (solid fills) and `accent-text` (text on
+ * page background) values so both stay AA-contrast in each theme.
+ */
+@layer base {
+  :root {
+    --bg: 251 249 245;
+    --surface: 255 255 255;
+    --surface-muted: 245 242 236;
+    --fg: 20 17 14;
+    --muted: 107 99 91;
+    --border: 229 223 214;
+    --accent: 199 56 26;
+    --accent-fg: 255 255 255;
+    --accent-text: 168 46 20;
+    --accent-soft: 255 237 231;
+  }
+
+  .dark {
+    --bg: 12 11 10;
+    --surface: 20 18 16;
+    --surface-muted: 27 24 21;
+    --fg: 245 241 234;
+    --muted: 163 154 144;
+    --border: 42 38 34;
+    --accent: 255 122 82;
+    --accent-fg: 26 10 5;
+    --accent-text: 255 138 98;
+    --accent-soft: 45 26 19;
+  }
+
+  /* Respect the OS setting before hydration when the user picked "system". */
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the sticky header never covers a heading. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible, on-brand focus ring for keyboard users only. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg rounded-sm;
+  }
+
+  ::selection {
+    @apply bg-accent text-accent-fg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Skip link: hidden until focused. */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100]
+           focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm
+           focus:font-medium focus:text-accent-fg;
+  }
+}
+
+@layer utilities {
+  /* Fine film grain — a data-URI SVG, so it costs no extra request. */
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  }
+
+  /* Dotted grid used behind the hero. */
+  .bg-dots {
+    background-image: radial-gradient(rgb(var(--fg) / 0.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
