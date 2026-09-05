@@ -89,7 +89,16 @@ export function HeroStatForm({ stat }: { stat?: HeroStat & { visible?: boolean }
   );
 }
 
-const SOCIAL_ICON_OPTIONS = ['github', 'linkedin', 'whatsapp', 'mail', 'external'] as const;
+const SOCIAL_ICON_OPTIONS = [
+  'github',
+  'linkedin',
+  'whatsapp',
+  'telegram',
+  'discord',
+  'youtube',
+  'mail',
+  'external',
+] as const;
 
 export function SocialLinkForm({ link }: { link?: SocialLink & { visible?: boolean } }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(saveSocialLink, null);

@@ -174,7 +174,16 @@ export function initialsFrom(name: string): string {
 }
 
 /** Valid icons for a social link; anything unknown renders the external glyph. */
-const SOCIAL_ICONS: readonly string[] = ['github', 'linkedin', 'whatsapp', 'telegram', 'mail', 'external'];
+const SOCIAL_ICONS: readonly string[] = [
+  'github',
+  'linkedin',
+  'whatsapp',
+  'telegram',
+  'discord',
+  'youtube',
+  'mail',
+  'external',
+];
 
 export function socialIcon(icon: string): IconName {
   return SOCIAL_ICONS.includes(icon) ? (icon as IconName) : 'external';
