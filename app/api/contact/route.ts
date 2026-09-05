@@ -15,15 +15,28 @@ import { siteConfig } from '@/lib/site';
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
 
+/**
+ * Reads an environment variable, treating a blank value as unset.
+ *
+ * `??` only falls back on null/undefined, so a variable that exists but is
+ * empty would otherwise win and yield ''. That is how an empty
+ * NEXT_PUBLIC_SITE_URL once broke the build; here it would mean sending mail
+ * to nobody.
+ */
+const envOr = (value: string | undefined, fallback: string) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+};
+
 /** Where enquiries land. Defaults to the address in the site config. */
-const TO_ADDRESS = process.env.CONTACT_TO_EMAIL ?? siteConfig.email;
+const TO_ADDRESS = envOr(process.env.CONTACT_TO_EMAIL, siteConfig.email);
 
 /**
  * Resend's shared sender works with no domain setup, but can only deliver to
  * the address that owns the Resend account. Set CONTACT_FROM_EMAIL once you
  * have verified your own domain.
  */
-const FROM_ADDRESS = process.env.CONTACT_FROM_EMAIL ?? 'Portfolio <onboarding@resend.dev>';
+const FROM_ADDRESS = envOr(process.env.CONTACT_FROM_EMAIL, 'Portfolio <onboarding@resend.dev>');
 
 type ContactPayload = {
   name?: unknown;

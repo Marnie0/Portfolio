@@ -1,3 +1,34 @@
+/**
+ * Last-resort site URL, used when NEXT_PUBLIC_SITE_URL is absent or unusable.
+ * It only has to be a *parseable* absolute URL so `new URL()` cannot throw
+ * during the build; the real value is set per environment.
+ */
+const FALLBACK_SITE_URL = 'https://placeholder.vercel.app';
+
+/**
+ * Resolves the public site URL, never throwing.
+ *
+ * `process.env.X ?? fallback` was not enough: a variable that exists but is
+ * empty is the string '', which passes a nullish check and then throws
+ * `TypeError: Invalid URL` inside `new URL()` while Next collects metadata —
+ * failing the build. Blank and unparseable values are treated as absent, and a
+ * bare host like "my-site.vercel.app" gets a scheme so it still works.
+ */
+function resolveSiteUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return FALLBACK_SITE_URL;
+
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+  try {
+    // `.origin` also normalises away any path or trailing slash, so callers can
+    // safely append paths such as `${siteConfig.url}/sitemap.xml`.
+    return new URL(withScheme).origin;
+  } catch {
+    return FALLBACK_SITE_URL;
+  }
+}
+
 /** Site-wide configuration used for SEO metadata, sitemap and structured data. */
 export const siteConfig = {
   name: 'Ibrahim Hassan',
@@ -17,7 +48,7 @@ export const siteConfig = {
   location: 'Cairo, Egypt',
   availability: 'Open to freelance & collaboration',
   /** Set NEXT_PUBLIC_SITE_URL in production so absolute OG URLs resolve. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com',
+  url: resolveSiteUrl(),
   socials: {
     github: 'https://github.com/Marnie0',
     linkedin: 'https://www.linkedin.com/in/ibrahim-hassan-552692239/',
