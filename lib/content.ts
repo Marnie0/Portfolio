@@ -162,6 +162,14 @@ export const services: readonly Service[] = [
     icon: 'database',
   },
   {
+    id: 'ai-assisted',
+    title: 'AI-Assisted Development',
+    description:
+      'I work with AI throughout the build to move faster and deliver better results \u2014 without cutting corners. Everything it produces is reviewed, tested and understood before it ships.',
+    deliverables: ['Faster turnaround', 'Fewer bugs reaching you', 'Reviewed, tested output'],
+    icon: 'gauge',
+  },
+  {
     id: 'debugging',
     title: 'Bug Fixing & Troubleshooting',
     description:
@@ -176,14 +184,6 @@ export const services: readonly Service[] = [
       'I do not disappear at handover. Every project includes 30 days of free maintenance and technical support after launch.',
     deliverables: ['30 days free support', 'Post-launch bug fixes', 'Handover walkthrough'],
     icon: 'lifebuoy',
-  },
-  {
-    id: 'ai-assisted',
-    title: 'AI-Assisted Development',
-    description:
-      'I work with AI throughout the build to move faster and deliver better results \u2014 without cutting corners. Everything it produces is reviewed, tested and understood before it ships.',
-    deliverables: ['Faster turnaround', 'Fewer bugs reaching you', 'Reviewed, tested output'],
-    icon: 'gauge',
   },
 ];
 
