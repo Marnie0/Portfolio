@@ -79,6 +79,18 @@ async function nextSortOrder(
   return (data?.sort_order ?? 0) + 1;
 }
 
+
+/**
+ * Pulls the column name out of the two shapes this can arrive in: PostgREST's
+ * schema-cache message (PGRST204) and Postgres' own 42703.
+ */
+function missingColumnFrom(message: string): string | null {
+  const cached = message.match(/Could not find the '([\w.]+)' column/);
+  if (cached) return cached[1].split('.').pop() ?? null;
+  const direct = message.match(/column ["']?(?:[\w]+\.)*(\w+)["']? does not exist/);
+  return direct ? direct[1] : null;
+}
+
 export type ActionState = { error: string } | null;
 
 /* ----------------------------- shared actions ---------------------------- */
@@ -417,11 +429,30 @@ export async function saveSiteSettings(
   if (!values.name) return { error: 'Name is required — it is the site heading.' };
   if (!values.email) return { error: 'Email is required.' };
 
-  // The row is created by the seed, but upsert keeps this working on a fresh
-  // database where nobody has run it yet.
-  const { error } = await supabase
-    .from('site_settings')
-    .upsert({ id: 1, ...values }, { onConflict: 'id' });
+  const write = () =>
+    // The row is created by the seed, but upsert keeps this working on a fresh
+    // database where nobody has run it yet.
+    supabase.from('site_settings').upsert({ id: 1, ...values }, { onConflict: 'id' });
+
+  let { error } = await write();
+
+  // A column this build knows about may not exist yet if its migration has not
+  // been run. Rather than blocking every other field, drop the unknown column
+  // and save the rest — then say plainly what was skipped.
+  const missing = error ? missingColumnFrom(error.message) : null;
+  if (missing && missing in values) {
+    const hadValue = Boolean(String(values[missing] ?? '').trim());
+    delete values[missing];
+    ({ error } = await write());
+
+    if (!error && hadValue) {
+      return {
+        error:
+          `Saved everything except "${missing}" — that column does not exist yet. ` +
+          `Run supabase/06_telegram.sql in the Supabase SQL editor, then set it again.`,
+      };
+    }
+  }
 
   if (error) return { error: `Could not save: ${error.message}` };
 
