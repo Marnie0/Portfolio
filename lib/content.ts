@@ -132,19 +132,17 @@ export type Service = {
 
 export const services: readonly Service[] = [
   {
-    id: 'responsive-web',
-    title: 'Responsive Web Development',
-    description:
-      'Websites that hold up on every screen size, built mobile-first with HTML5, CSS3 and React.',
-    deliverables: ['Mobile-first layout', 'Reusable components', 'Cross-browser checks'],
-    icon: 'layout',
-  },
-  {
     id: 'react-frontend',
     title: 'React Frontend Development',
     description:
-      'Interactive interfaces built with React, JavaScript and TypeScript, wired up to your data through APIs.',
-    deliverables: ['Component architecture', 'TypeScript throughout', 'API integration'],
+      'Interactive interfaces in React, JavaScript and TypeScript that hold up on every screen size, wired up to your data through APIs.',
+    deliverables: [
+      'Component architecture',
+      'Mobile-first layout',
+      'TypeScript throughout',
+      'API integration',
+      'Cross-browser checks',
+    ],
     icon: 'code',
   },
   {
