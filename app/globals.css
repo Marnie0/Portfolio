@@ -100,3 +100,153 @@
     text-wrap: pretty;
   }
 }
+
+/* ---------------------------- Article content ----------------------------- */
+
+@layer base {
+  /* Syntax-highlighting palette. rehype-highlight emits highlight.js class
+     names; these tokens keep code legible in both themes rather than pulling
+     in a fixed light- or dark-only stylesheet. */
+  :root {
+    --code-keyword: 168 46 20;
+    --code-string: 21 101 52;
+    --code-comment: 122 115 107;
+    --code-number: 146 64 14;
+    --code-fn: 30 64 175;
+  }
+
+  .dark {
+    --code-keyword: 255 138 98;
+    --code-string: 134 208 150;
+    --code-comment: 138 130 121;
+    --code-number: 240 177 122;
+    --code-fn: 137 180 250;
+  }
+}
+
+@layer components {
+  /* Long-form article body. Written as one class rather than per-element
+     overrides in the renderer, so the markdown component stays declarative. */
+  .article-body {
+    @apply text-base leading-relaxed text-fg/90;
+  }
+
+  .article-body > * + * {
+    @apply mt-5;
+  }
+
+  .article-body h2 {
+    @apply mt-12 font-display text-3xl leading-tight text-balance text-fg;
+  }
+
+  .article-body h3 {
+    @apply mt-10 font-display text-2xl leading-snug text-balance text-fg;
+  }
+
+  .article-body h4 {
+    @apply mt-8 text-lg font-semibold text-fg;
+  }
+
+  .article-body p {
+    @apply text-pretty;
+  }
+
+  .article-body a {
+    @apply font-medium text-accent-text underline underline-offset-4 hover:text-fg;
+  }
+
+  .article-body strong {
+    @apply font-semibold text-fg;
+  }
+
+  .article-body ul {
+    @apply list-disc space-y-2 pl-6 marker:text-muted;
+  }
+
+  .article-body ol {
+    @apply list-decimal space-y-2 pl-6 marker:text-muted;
+  }
+
+  .article-body blockquote {
+    @apply border-l-2 border-accent bg-accent-soft/50 py-3 pl-5 pr-4 text-fg/80;
+  }
+
+  .article-body img {
+    @apply my-8 w-full rounded-2xl border border-border;
+  }
+
+  .article-body hr {
+    @apply my-10 border-border;
+  }
+
+  /* Inline code — excludes code inside a <pre>, which is styled below. */
+  .article-body :not(pre) > code {
+    @apply rounded-md border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-[0.85em] text-fg;
+  }
+
+  .article-body pre {
+    @apply my-6 overflow-x-auto rounded-2xl border border-border bg-surface-muted p-5;
+  }
+
+  .article-body pre code {
+    @apply block font-mono text-sm leading-relaxed text-fg;
+  }
+
+  /* Wide tables scroll inside their own container instead of the page. */
+  .article-body table {
+    @apply my-6 block w-full overflow-x-auto border-collapse text-sm;
+  }
+
+  .article-body th {
+    @apply border-b border-border px-3 py-2 text-left font-semibold text-fg;
+  }
+
+  .article-body td {
+    @apply border-b border-border px-3 py-2 align-top text-muted;
+  }
+
+  /* highlight.js tokens */
+  .hljs-keyword,
+  .hljs-built_in,
+  .hljs-literal,
+  .hljs-type,
+  .hljs-selector-tag {
+    color: rgb(var(--code-keyword));
+  }
+
+  .hljs-string,
+  .hljs-attr,
+  .hljs-regexp,
+  .hljs-addition {
+    color: rgb(var(--code-string));
+  }
+
+  .hljs-comment,
+  .hljs-quote,
+  .hljs-meta {
+    color: rgb(var(--code-comment));
+    font-style: italic;
+  }
+
+  .hljs-number,
+  .hljs-symbol,
+  .hljs-variable,
+  .hljs-template-variable {
+    color: rgb(var(--code-number));
+  }
+
+  .hljs-title,
+  .hljs-function .hljs-title,
+  .hljs-section,
+  .hljs-name {
+    color: rgb(var(--code-fn));
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: 600;
+  }
+}

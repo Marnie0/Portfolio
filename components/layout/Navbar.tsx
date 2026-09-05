@@ -1,12 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { m, useScroll, useSpring } from 'framer-motion';
 import { Icon } from '@/components/ui/Icon';
 import { ThemeToggle } from './ThemeToggle';
 import { initials, navLinks, siteConfig } from '@/lib/site';
 
 export function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>('');
@@ -27,7 +29,9 @@ export function Navbar() {
 
   /* Scroll spy. An IntersectionObserver keeps this off the scroll thread. */
   useEffect(() => {
-    const ids = navLinks.map((link) => link.href.slice(1));
+    const ids = navLinks
+      .filter((link) => link.href.startsWith('/#'))
+      .map((link) => link.href.slice(2));
     const sections = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
@@ -102,7 +106,7 @@ export function Navbar() {
         className="mx-auto flex h-16 w-full max-w-content items-center justify-between px-5 sm:px-8"
       >
         <a
-          href="#top"
+          href="/#top"
           className="group flex items-center gap-2.5 rounded-md text-sm font-semibold tracking-tight"
         >
           <span
@@ -116,7 +120,9 @@ export function Navbar() {
 
         <ul className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => {
-            const isActive = activeId === link.href.slice(1);
+            const isActive = link.href.startsWith('/#')
+              ? activeId === link.href.slice(2)
+              : pathname.startsWith(link.href);
             return (
               <li key={link.href}>
                 <a
@@ -147,7 +153,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <a
-            href="#contact"
+            href="/#contact"
             className="hidden rounded-full bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity duration-200 hover:opacity-85 sm:inline-block"
           >
             Hire me

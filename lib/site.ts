@@ -74,13 +74,20 @@ export const initials = (() => {
   return (first + last).toUpperCase();
 })();
 
-/** Nav order mirrors the section order on the page. */
+/**
+ * Nav order mirrors the section order on the page.
+ *
+ * Section links are root-relative (`/#about`, not `#about`) so they also work
+ * from a standalone page such as /articles. On the home page the browser still
+ * treats them as same-document fragment navigation, so scrolling stays smooth.
+ */
 export const navLinks = [
-  { href: '#about', label: 'About' },
-  { href: '#education', label: 'Education' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#services', label: 'Services' },
-  { href: '#projects', label: 'Projects' },
-  { href: '#achievements', label: 'Achievements' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#about', label: 'About' },
+  { href: '/#education', label: 'Education' },
+  { href: '/#skills', label: 'Skills' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#projects', label: 'Projects' },
+  { href: '/#achievements', label: 'Achievements' },
+  { href: '/articles', label: 'Articles' },
+  { href: '/#contact', label: 'Contact' },
 ] as const;

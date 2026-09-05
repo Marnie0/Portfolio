@@ -12,7 +12,7 @@ export function Footer() {
       <div className="mx-auto w-full max-w-content px-5 py-12 sm:px-8 sm:py-16">
         <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
           <div className="max-w-sm">
-            <a href="#top" className="inline-flex items-center gap-2.5 text-sm font-semibold">
+            <a href="/#top" className="inline-flex items-center gap-2.5 text-sm font-semibold">
               <span
                 aria-hidden
                 className="grid h-8 w-8 place-items-center rounded-lg bg-accent font-display text-base tracking-tight text-accent-fg"
