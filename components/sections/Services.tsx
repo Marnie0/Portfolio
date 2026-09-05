@@ -10,7 +10,7 @@ export function Services() {
         id="services"
         eyebrow="Services"
         title="How I can help"
-        description="Freelance and collaboration work — from a responsive frontend through to the API and database behind it."
+        description="Freelance and collaboration work — from a responsive frontend through to the API and database behind it, built faster with AI in the loop."
       />
 
       <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

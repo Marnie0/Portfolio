@@ -82,7 +82,7 @@ export const skillGroups: readonly SkillGroup[] = [
   {
     id: 'frontend',
     title: 'Frontend Development',
-    skills: ['HTML5', 'CSS3', 'Tailwind CSS', 'Bootstrap', 'React'],
+    skills: ['HTML5', 'CSS3', 'Tailwind CSS', 'Bootstrap', 'React', 'Next.js'],
   },
   {
     id: 'backend',
@@ -107,6 +107,7 @@ export const skillGroups: readonly SkillGroup[] = [
       'Programming Fundamentals',
       'Data Structures and Algorithms',
       'Clean Code',
+      'AI-Assisted Development',
     ],
   },
 ];
@@ -126,7 +127,7 @@ export type Service = {
   description: string;
   deliverables: readonly string[];
   /** Key into the icon map in `components/ui/Icon.tsx`. */
-  icon: 'code' | 'layout' | 'server' | 'database' | 'wrench' | 'lifebuoy';
+  icon: 'code' | 'layout' | 'server' | 'database' | 'wrench' | 'lifebuoy' | 'gauge';
 };
 
 export const services: readonly Service[] = [
@@ -177,6 +178,14 @@ export const services: readonly Service[] = [
       'I do not disappear at handover. Every project includes 30 days of free maintenance and technical support after launch.',
     deliverables: ['30 days free support', 'Post-launch bug fixes', 'Handover walkthrough'],
     icon: 'lifebuoy',
+  },
+  {
+    id: 'ai-assisted',
+    title: 'AI-Assisted Development',
+    description:
+      'I work with AI throughout the build to move faster and deliver better results \u2014 without cutting corners. Everything it produces is reviewed, tested and understood before it ships.',
+    deliverables: ['Faster turnaround', 'Fewer bugs reaching you', 'Reviewed, tested output'],
+    icon: 'gauge',
   },
 ];
 
