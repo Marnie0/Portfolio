@@ -10,7 +10,7 @@ export function Achievements() {
         id="achievements"
         eyebrow="Achievements"
         title="Milestones along the way"
-        description="Certifications, competitions, talks and the occasional peer-reviewed paper."
+        description="Competitive programming, professional training and academic progress."
       />
 
       <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

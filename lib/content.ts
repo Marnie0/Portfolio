@@ -263,64 +263,39 @@ export type Achievement = {
   id: string;
   title: string;
   issuer: string;
+  /** Free text, not a strict date — an ongoing effort has no single year. */
   year: string;
   description: string;
-  type: 'Award' | 'Certification' | 'Hackathon' | 'Speaking' | 'Publication';
+  /** Kept short: it renders as a badge beside the year on a narrow card. */
+  type: 'Problem Solving' | 'Training' | 'Academic';
 };
 
 export const achievements: readonly Achievement[] = [
   {
-    id: 'hack-eu',
-    title: 'First Place — EU Accessibility Hackathon',
-    issuer: 'Inclusive Web Foundation',
-    year: '2025',
+    id: 'codeforces',
+    title: '350+ Problems Solved on Codeforces',
+    issuer: 'Codeforces',
+    year: 'Ongoing',
     description:
-      'Built a screen-reader-first navigation prototype for transit apps in 48 hours, judged first of 140 teams.',
-    type: 'Hackathon',
+      'Solved over 350 competitive programming problems, building the algorithmic thinking and problem-solving habits I rely on in everything else I build.',
+    type: 'Problem Solving',
   },
   {
-    id: 'gcp',
-    title: 'Professional Cloud Architect',
-    issuer: 'Google Cloud',
-    year: '2024',
+    id: 'depi-track',
+    title: 'React Frontend Web Developer Track',
+    issuer: 'Digital Egypt Pioneers Initiative (DEPI)',
+    year: '2026',
     description:
-      'Certified in designing secure, scalable and cost-aware cloud architecture on managed infrastructure.',
-    type: 'Certification',
+      'Completed the professional training track covering modern frontend development with JavaScript, TypeScript and React, alongside version control and software development practices.',
+    type: 'Training',
   },
   {
-    id: 'talk',
-    title: 'Speaker — "Rendering Under 100 KB"',
-    issuer: 'JSConf EU',
-    year: '2024',
+    id: 'bsc-progress',
+    title: 'B.Sc. Computer Science — 3.00/4.00 GPA',
+    issuer: 'Modern Academy, Cairo',
+    year: '2024 – 2028',
     description:
-      'A 30-minute talk on shipping interactive interfaces within a strict JavaScript budget. 12k views.',
-    type: 'Speaking',
-  },
-  {
-    id: 'oss',
-    title: 'Open Source Contributor of the Year',
-    issuer: 'Berlin Dev Collective',
-    year: '2024',
-    description:
-      'Recognised for maintaining Quill Editor and mentoring nine first-time open-source contributors.',
-    type: 'Award',
-  },
-  {
-    id: 'paper',
-    title: 'Perceived Latency in Progressive Web Apps',
-    issuer: 'ACM CHI — Late-Breaking Work',
-    year: '2023',
-    description:
-      'Peer-reviewed study on how skeleton screens shape users’ perception of speed versus measured load time.',
-    type: 'Publication',
-  },
-  {
-    id: 'aws',
-    title: 'AWS Solutions Architect — Associate',
-    issuer: 'Amazon Web Services',
-    year: '2022',
-    description:
-      'Certification covering resilient architecture, networking fundamentals and cost optimisation.',
-    type: 'Certification',
+      'Currently in the third year of the programme, maintaining a 3.00/4.00 GPA across programming, data structures and algorithms, databases and core computer science subjects.',
+    type: 'Academic',
   },
 ];
