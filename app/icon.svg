@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <rect width="64" height="64" rx="14" fill="#C7381A"/>
   <g fill="#FFFFFF">
-    <rect x="19" y="15" width="26" height="6" rx="1.5"/>
-    <rect x="28" y="15" width="8" height="34"/>
-    <rect x="19" y="43" width="26" height="6" rx="1.5"/>
+    <!-- I: slab serifs top and bottom, stem centred on them -->
+    <rect x="10" y="14" width="18" height="5" rx="1.5"/>
+    <rect x="16" y="14" width="6" height="36"/>
+    <rect x="10" y="45" width="18" height="5" rx="1.5"/>
+    <!-- H: two stems at the same weight, crossbar on the vertical centre -->
+    <rect x="34" y="14" width="6" height="36"/>
+    <rect x="48" y="14" width="6" height="36"/>
+    <rect x="34" y="29" width="20" height="6"/>
   </g>
 </svg>

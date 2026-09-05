@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { m, useScroll, useSpring } from 'framer-motion';
 import { Icon } from '@/components/ui/Icon';
 import { ThemeToggle } from './ThemeToggle';
-import { navLinks, siteConfig } from '@/lib/site';
+import { initials, navLinks, siteConfig } from '@/lib/site';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -107,9 +107,9 @@ export function Navbar() {
         >
           <span
             aria-hidden
-            className="grid h-8 w-8 place-items-center rounded-lg bg-accent font-display text-base text-accent-fg transition-transform duration-300 group-hover:-rotate-6"
+            className="grid h-8 w-8 place-items-center rounded-lg bg-accent font-display text-base tracking-tight text-accent-fg transition-transform duration-300 group-hover:-rotate-6"
           >
-            {siteConfig.name.charAt(0)}
+            {initials}
           </span>
           <span className="sr-only sm:not-sr-only">{siteConfig.shortName}</span>
         </a>

@@ -1,5 +1,5 @@
 import { Icon, type IconName } from '@/components/ui/Icon';
-import { navLinks, siteConfig } from '@/lib/site';
+import { initials, navLinks, siteConfig } from '@/lib/site';
 
 const socials: { href: string; label: string; icon: IconName }[] = [
   { href: siteConfig.socials.github, label: 'GitHub', icon: 'github' },
@@ -15,9 +15,9 @@ export function Footer() {
             <a href="#top" className="inline-flex items-center gap-2.5 text-sm font-semibold">
               <span
                 aria-hidden
-                className="grid h-8 w-8 place-items-center rounded-lg bg-accent font-display text-base text-accent-fg"
+                className="grid h-8 w-8 place-items-center rounded-lg bg-accent font-display text-base tracking-tight text-accent-fg"
               >
-                {siteConfig.name.charAt(0)}
+                {initials}
               </span>
               {siteConfig.name}
             </a>

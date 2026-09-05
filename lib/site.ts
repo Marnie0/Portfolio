@@ -27,6 +27,18 @@ export const siteConfig = {
 
 export type SiteConfig = typeof siteConfig;
 
+/**
+ * Monogram for the logo badge: the first letter of the first and last name,
+ * so "Ibrahim Hassan" reads "IH". Taking only `name.charAt(0)` gave "I".
+ * A single-word name yields a single letter rather than a doubled one.
+ */
+export const initials = (() => {
+  const words = siteConfig.name.trim().split(/\s+/);
+  const first = words[0]?.charAt(0) ?? '';
+  const last = words.length > 1 ? words[words.length - 1].charAt(0) : '';
+  return (first + last).toUpperCase();
+})();
+
 /** Nav order mirrors the section order on the page. */
 export const navLinks = [
   { href: '#about', label: 'About' },
