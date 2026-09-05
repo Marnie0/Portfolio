@@ -67,21 +67,27 @@ function ProjectLinks({ project }: { project: Project }) {
   );
 }
 
+/**
+ * Fixed 16:10 media block.
+ *
+ * The ratio is pinned on the container and the image uses `fill`, so every
+ * card's image occupies exactly the same height whatever the source aspect
+ * ratio is — a portrait upload is cropped rather than making its card taller.
+ * Declaring width/height on the image instead left the height dependent on the
+ * file, and the empty-state branch used a different ratio again, so cards in a
+ * row did not line up.
+ */
 function ProjectImage({ project, sizes }: { project: Project; sizes: string }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-surface-muted">
-      {project.image_url ? (
+    <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-2xl border border-border bg-surface-muted">
+      {project.image_url && (
         <Image
           src={project.image_url}
           alt={project.image_alt}
-          width={1600}
-          height={1000}
+          fill
           sizes={sizes}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03]"
+          className="object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03]"
         />
-      ) : (
-        // No image yet: keep the card's shape instead of collapsing the layout.
-        <div aria-hidden className="aspect-[16/10] w-full" />
       )}
     </div>
   );
@@ -134,7 +140,9 @@ function FeaturedProject({ project, index }: { project: Project; index: number }
 
 function ProjectCard({ project, delay }: { project: Project; delay: number }) {
   return (
-    <Reveal as="li" delay={delay}>
+    // h-full on the grid item: without a definite height here, `h-full` on the
+    // article below has nothing to resolve against.
+    <Reveal as="li" delay={delay} className="h-full">
       <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-surface p-4 transition-colors duration-300 hover:border-accent/40 sm:p-5">
         <ProjectImage project={project} sizes="(min-width: 1024px) 46vw, 92vw" />
 
