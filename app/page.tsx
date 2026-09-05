@@ -8,6 +8,13 @@ import { Achievements } from '@/components/sections/Achievements';
 import { ArticlesCta } from '@/components/sections/ArticlesCta';
 import { Contact } from '@/components/sections/Contact';
 
+/**
+ * Content comes from Supabase, so the page is rebuilt at most once a minute.
+ * Without this the homepage would be fully static and an admin edit would
+ * never appear until the next deploy.
+ */
+export const revalidate = 60;
+
 export default function HomePage() {
   return (
     <>

@@ -8,6 +8,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+
+/**
+ * Sections appear here as each one is migrated to the database.
+ * Articles was first; the rest follow in the same pattern.
+ */
+const adminSections = [
+  { href: '/admin', label: 'Articles' },
+  { href: '/admin/achievements', label: 'Achievements' },
+] as const;
+
 /** Never cache the admin area — it is per-session by definition. */
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +66,18 @@ export default async function ProtectedAdminLayout({
           </form>
         </div>
       </div>
+
+      <nav aria-label="Content sections" className="mt-6 flex flex-wrap gap-2">
+        {adminSections.map((section) => (
+          <Link
+            key={section.href}
+            href={section.href}
+            className="rounded-full border border-border px-4 py-2 text-sm text-fg transition-colors hover:bg-surface-muted"
+          >
+            {section.label}
+          </Link>
+        ))}
+      </nav>
 
       {children}
     </div>

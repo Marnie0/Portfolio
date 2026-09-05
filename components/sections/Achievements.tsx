@@ -1,9 +1,11 @@
 import { Section, SectionHeading } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
 import { Icon } from '@/components/ui/Icon';
-import { achievements } from '@/lib/content';
+import { getAchievements } from '@/lib/content-db/achievements';
 
-export function Achievements() {
+export async function Achievements() {
+  const achievements = await getAchievements();
+
   return (
     <Section id="achievements" className="bg-surface-muted/40">
       <SectionHeading
