@@ -15,6 +15,7 @@ export type SiteSettings = {
   phone_display: string;
   phone_tel: string;
   whatsapp_url: string;
+  telegram_url: string;
   resume_url: string;
   hero_cta_primary: string;
   hero_cta_secondary: string;
@@ -50,6 +51,8 @@ export function fallbackSettings(): SiteSettings {
     phone_display: siteConfig.phone.display,
     phone_tel: siteConfig.phone.tel,
     whatsapp_url: siteConfig.phone.whatsapp,
+    // No compiled default: the button stays hidden until a URL is set.
+    telegram_url: '',
     resume_url: siteConfig.resumeUrl,
     hero_cta_primary: 'View work',
     hero_cta_secondary: 'Contact me',
@@ -171,7 +174,7 @@ export function initialsFrom(name: string): string {
 }
 
 /** Valid icons for a social link; anything unknown renders the external glyph. */
-const SOCIAL_ICONS: readonly string[] = ['github', 'linkedin', 'whatsapp', 'mail', 'external'];
+const SOCIAL_ICONS: readonly string[] = ['github', 'linkedin', 'whatsapp', 'telegram', 'mail', 'external'];
 
 export function socialIcon(icon: string): IconName {
   return SOCIAL_ICONS.includes(icon) ? (icon as IconName) : 'external';

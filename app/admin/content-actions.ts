@@ -390,6 +390,7 @@ const SETTINGS_TEXT_FIELDS = [
   'phone_display',
   'phone_tel',
   'whatsapp_url',
+  'telegram_url',
   'resume_url',
   'hero_cta_primary',
   'hero_cta_secondary',

@@ -72,16 +72,34 @@ export async function Contact() {
                     </span>
                   </a>
 
-                  <a
-                    href={settings.whatsapp_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Message ${settings.phone_display} on WhatsApp (opens in a new tab)`}
-                    title="Chat on WhatsApp"
-                    className="grid w-14 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-[#25D366] transition-colors duration-200 hover:border-[#25D366]/60 hover:bg-[#25D366]/10"
-                  >
-                    <Icon name="whatsapp" className="h-5 w-5" />
-                  </a>
+                  {/* Each chat button is rendered only when its URL is set,
+                      so an empty field hides the button rather than linking
+                      nowhere. */}
+                  {settings.whatsapp_url && (
+                    <a
+                      href={settings.whatsapp_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Message ${settings.phone_display} on WhatsApp (opens in a new tab)`}
+                      title="Chat on WhatsApp"
+                      className="grid w-14 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-[#25D366] transition-colors duration-200 hover:border-[#25D366]/60 hover:bg-[#25D366]/10"
+                    >
+                      <Icon name="whatsapp" className="h-5 w-5" />
+                    </a>
+                  )}
+
+                  {settings.telegram_url && (
+                    <a
+                      href={settings.telegram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Message me on Telegram (opens in a new tab)"
+                      title="Chat on Telegram"
+                      className="grid w-14 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-[#229ED9] transition-colors duration-200 hover:border-[#229ED9]/60 hover:bg-[#229ED9]/10"
+                    >
+                      <Icon name="telegram" className="h-5 w-5" />
+                    </a>
+                  )}
                 </li>
 
                 {channels.map((channel) => (

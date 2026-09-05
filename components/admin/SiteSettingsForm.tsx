@@ -67,7 +67,8 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
         <Field name="email" title="Email" type="email" value={settings.email} />
         <Field name="phone_display" title="Phone (displayed)" hint="e.g. +20 107 043 9165" value={settings.phone_display} />
         <Field name="phone_tel" title="Phone (dial)" hint="digits only, used by tel:" value={settings.phone_tel} />
-        <Field name="whatsapp_url" title="WhatsApp URL" hint="https://wa.me/…" value={settings.whatsapp_url} />
+        <Field name="whatsapp_url" title="WhatsApp URL" hint="https://wa.me/… — leave blank to hide the button" value={settings.whatsapp_url} />
+        <Field name="telegram_url" title="Telegram URL" hint="https://t.me/yourusername — leave blank to hide the button" value={settings.telegram_url} />
         <Field name="resume_url" title="CV / résumé path" hint="e.g. /CV.pdf" value={settings.resume_url} />
       </fieldset>
 
