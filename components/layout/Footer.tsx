@@ -1,12 +1,11 @@
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { initials, navLinks, siteConfig } from '@/lib/site';
+import { Icon } from '@/components/ui/Icon';
+import { navLinks } from '@/lib/site';
+import { getSiteSettings, getSocialLinks, initialsFrom, socialIcon } from '@/lib/content-db/settings';
 
-const socials: { href: string; label: string; icon: IconName }[] = [
-  { href: siteConfig.socials.github, label: 'GitHub', icon: 'github' },
-  { href: siteConfig.socials.linkedin, label: 'LinkedIn', icon: 'linkedin' },
-];
+export async function Footer() {
+  const [settings, socials] = await Promise.all([getSiteSettings(), getSocialLinks()]);
+  const initials = initialsFrom(settings.name);
 
-export function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto w-full max-w-content px-5 py-12 sm:px-8 sm:py-16">
@@ -19,14 +18,14 @@ export function Footer() {
               >
                 {initials}
               </span>
-              {siteConfig.name}
+              {settings.name}
             </a>
-            <p className="mt-4 text-sm leading-relaxed text-muted">{siteConfig.tagline}</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted">{settings.tagline}</p>
             <a
-              href={`mailto:${siteConfig.email}`}
+              href={`mailto:${settings.email}`}
               className="mt-3 inline-block py-1 text-sm font-medium text-accent-text underline underline-offset-4 hover:text-fg"
             >
-              {siteConfig.email}
+              {settings.email}
             </a>
           </div>
 
@@ -49,18 +48,18 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col-reverse items-start gap-6 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-muted">
-            © {new Date().getFullYear()} {siteConfig.name}. Built with Next.js and Tailwind CSS.
+            © {new Date().getFullYear()} {settings.name}. Built with Next.js and Tailwind CSS.
           </p>
           <ul className="flex items-center gap-2">
             {socials.map((social) => (
-              <li key={social.label}>
+              <li key={social.id}>
                 <a
-                  href={social.href}
+                  href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted transition-colors duration-200 hover:border-fg/30 hover:text-fg"
                 >
-                  <Icon name={social.icon} className="h-4 w-4" title={social.label} />
+                  <Icon name={socialIcon(social.icon)} className="h-4 w-4" title={social.label} />
                 </a>
               </li>
             ))}

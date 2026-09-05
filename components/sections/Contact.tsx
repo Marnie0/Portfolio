@@ -2,7 +2,7 @@ import { Section, SectionHeading } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { ContactForm } from './ContactForm';
-import { siteConfig } from '@/lib/site';
+import { getSiteSettings, getSocialLinks, socialIcon } from '@/lib/content-db/settings';
 
 type Channel = {
   href: string;
@@ -12,40 +12,36 @@ type Channel = {
   external?: boolean;
 };
 
-const channels: Channel[] = [
-  {
-    href: `mailto:${siteConfig.email}`,
-    label: 'Email',
-    value: siteConfig.email,
-    icon: 'mail',
-  },
-  {
-    href: siteConfig.socials.github,
-    label: 'GitHub',
-    value: '@Marnie0',
-    icon: 'github',
-    external: true,
-  },
-  {
-    href: siteConfig.socials.linkedin,
-    label: 'LinkedIn',
-    value: 'in/ibrahim-hassan-552692239',
-    icon: 'linkedin',
-    external: true,
-  },
-];
 
 const rowClass =
   'group flex items-center gap-4 rounded-2xl border border-border bg-surface px-4 py-3.5 transition-colors duration-200 hover:border-accent/45';
 
-export function Contact() {
+export async function Contact() {
+  const [settings, socials] = await Promise.all([getSiteSettings(), getSocialLinks()]);
+
+  const channels: Channel[] = [
+    {
+      href: `mailto:${settings.email}`,
+      label: 'Email',
+      value: settings.email,
+      icon: 'mail',
+    },
+    ...socials.map((social) => ({
+      href: social.url,
+      label: social.label,
+      value: social.display || social.url,
+      icon: socialIcon(social.icon),
+      external: true,
+    })),
+  ];
+
   return (
     <Section id="contact">
       <SectionHeading
         id="contact"
-        eyebrow="Contact"
-        title="Let's build something"
-        description="Open to freelance work and collaboration. Email, phone or WhatsApp — whichever suits you."
+        eyebrow={settings.contact_eyebrow}
+        title={settings.contact_title}
+        description={settings.contact_description}
       />
 
       <div className="mt-14 grid gap-10 lg:grid-cols-12 lg:gap-14">
@@ -64,23 +60,23 @@ export function Contact() {
                     sibling link — nesting it inside the tel link would be
                     invalid markup and unreachable by keyboard. */}
                 <li className="flex items-stretch gap-2.5">
-                  <a href={`tel:${siteConfig.phone.tel}`} className={`${rowClass} flex-1`}>
+                  <a href={`tel:${settings.phone_tel}`} className={`${rowClass} flex-1`}>
                     <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-muted text-muted transition-colors duration-200 group-hover:text-accent-text">
                       <Icon name="phone" className="h-4 w-4" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-fg">Phone</span>
                       <span className="block truncate text-xs text-muted">
-                        {siteConfig.phone.display}
+                        {settings.phone_display}
                       </span>
                     </span>
                   </a>
 
                   <a
-                    href={siteConfig.phone.whatsapp}
+                    href={settings.whatsapp_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Message ${siteConfig.phone.display} on WhatsApp (opens in a new tab)`}
+                    aria-label={`Message ${settings.phone_display} on WhatsApp (opens in a new tab)`}
                     title="Chat on WhatsApp"
                     className="grid w-14 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-[#25D366] transition-colors duration-200 hover:border-[#25D366]/60 hover:bg-[#25D366]/10"
                   >
@@ -117,9 +113,9 @@ export function Contact() {
             <div className="rounded-3xl border border-border bg-surface-muted/60 p-6">
               <p className="flex items-center gap-2 text-sm font-medium text-fg">
                 <Icon name="mapPin" className="h-4 w-4 text-accent-text" />
-                {siteConfig.location}
+                {settings.location}
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{siteConfig.availability}.</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{settings.availability}.</p>
             </div>
           </div>
         </Reveal>

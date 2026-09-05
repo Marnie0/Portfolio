@@ -7,6 +7,7 @@ import { MotionProvider } from '@/components/ui/MotionProvider';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { siteConfig } from '@/lib/site';
+import { getSiteSettings, getSocialLinks, initialsFrom } from '@/lib/content-db/settings';
 
 /* Self-hosted at build time by next/font — no render-blocking request to
    Google, and `display: swap` keeps text visible while the face loads. */
@@ -23,16 +24,24 @@ const instrumentSerif = Instrument_Serif({
   variable: '--font-display',
 });
 
-export const metadata: Metadata = {
+/**
+ * Async so the title, description and author come from the database like the
+ * rest of the site. metadataBase still uses the env var: it is needed at build
+ * time, before any query can run.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} — ${siteConfig.role}`,
-    template: `%s — ${siteConfig.name}`,
+    default: `${settings.name} — ${settings.role}`,
+    template: `%s — ${settings.name}`,
   },
-  description: siteConfig.description,
-  applicationName: siteConfig.name,
-  authors: [{ name: siteConfig.name, url: siteConfig.url }],
-  creator: siteConfig.name,
+  description: settings.description,
+  applicationName: settings.name,
+  authors: [{ name: settings.name, url: siteConfig.url }],
+  creator: settings.name,
   keywords: [
     'full-stack developer',
     'backend engineer',
@@ -49,21 +58,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_GB',
     url: siteConfig.url,
-    siteName: siteConfig.name,
-    title: `${siteConfig.name} — ${siteConfig.role}`,
-    description: siteConfig.description,
+    siteName: settings.name,
+    title: `${settings.name} — ${settings.role}`,
+    description: settings.description,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${siteConfig.name} — ${siteConfig.role}`,
-    description: siteConfig.description,
+    title: `${settings.name} — ${settings.role}`,
+    description: settings.description,
   },
   robots: {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
-};
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -73,21 +83,23 @@ export const viewport: Viewport = {
   colorScheme: 'light dark',
 };
 
-/** Structured data helps search engines render a richer result for the site. */
-const personSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: siteConfig.name,
-  jobTitle: siteConfig.role,
-  description: siteConfig.description,
-  email: `mailto:${siteConfig.email}`,
-  telephone: siteConfig.phone.tel,
-  url: siteConfig.url,
-  address: { '@type': 'PostalAddress', addressLocality: 'Cairo', addressCountry: 'EG' },
-  sameAs: Object.values(siteConfig.socials),
-};
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [settings, socials] = await Promise.all([getSiteSettings(), getSocialLinks()]);
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+  /** Structured data helps search engines render a richer result for the site. */
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: settings.name,
+    jobTitle: settings.role,
+    description: settings.description,
+    email: `mailto:${settings.email}`,
+    telephone: settings.phone_tel,
+    url: siteConfig.url,
+    address: { '@type': 'PostalAddress', addressLocality: 'Cairo', addressCountry: 'EG' },
+    // A link added in the admin appears in sameAs automatically.
+    sameAs: socials.map((social) => social.url),
+  };
   return (
     <html
       lang="en"
@@ -108,7 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="#main" className="skip-link">
               Skip to main content
             </a>
-            <Navbar />
+            <Navbar initials={initialsFrom(settings.name)} shortName={settings.short_name} />
             <main id="main">{children}</main>
             <Footer />
           </MotionProvider>

@@ -1,15 +1,10 @@
 import { Icon } from '@/components/ui/Icon';
-import { siteConfig } from '@/lib/site';
-
-const socials = [
-  { href: siteConfig.socials.github, label: 'GitHub', icon: 'github' },
-  { href: siteConfig.socials.linkedin, label: 'LinkedIn', icon: 'linkedin' },
-] as const;
-
-const stats = [
-  { value: '10+', label: 'Projects' },
-  { value: '20+', label: 'Repos' },
-] as const;
+import {
+  getHeroStats,
+  getSiteSettings,
+  getSocialLinks,
+  socialIcon,
+} from '@/lib/content-db/settings';
 
 /**
  * The hero is deliberately a *server* component with CSS-only animation.
@@ -21,8 +16,15 @@ const stats = [
  * ship no JavaScript, and are already neutralised by the reduced-motion rule
  * in `globals.css`.
  */
-export function Hero() {
-  const nameWords = siteConfig.name.split(' ');
+export async function Hero() {
+  // Independent queries, so they run together rather than in series.
+  const [settings, stats, socials] = await Promise.all([
+    getSiteSettings(),
+    getHeroStats(),
+    getSocialLinks(),
+  ]);
+
+  const nameWords = settings.name.split(' ');
 
   /** Staggered entrance, expressed as an animation-delay per element. */
   const rise = (delay: number) => ({ animationDelay: `${delay}s` });
@@ -50,7 +52,7 @@ export function Hero() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
           </span>
-          {siteConfig.availability}
+          {settings.availability}
         </p>
 
         <h1
@@ -68,7 +70,7 @@ export function Hero() {
         </h1>
 
         <p className="mt-6 max-w-xl animate-slide text-lg font-medium leading-relaxed text-fg text-pretty sm:text-xl">
-          {siteConfig.role}
+          {settings.role}
         </p>
 
         <div style={rise(0.22)} className="mt-9 flex animate-rise flex-wrap items-center gap-3">
@@ -76,7 +78,7 @@ export function Hero() {
             href="#projects"
             className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
           >
-            View work
+            {settings.hero_cta_primary}
             <Icon
               name="arrowRight"
               className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
@@ -87,15 +89,15 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-medium text-fg transition-colors duration-200 hover:border-fg/30 hover:bg-surface-muted"
           >
             <Icon name="mail" className="h-4 w-4" />
-            Contact me
+            {settings.hero_cta_secondary}
           </a>
           <a
-            href={siteConfig.resumeUrl}
+            href={settings.resume_url}
             download
             className="inline-flex items-center gap-2 rounded-full px-3 py-3 text-sm font-medium text-muted underline-offset-4 transition-colors duration-200 hover:text-fg hover:underline"
           >
             <Icon name="download" className="h-4 w-4" />
-            Résumé
+            {settings.hero_resume_label}
           </a>
         </div>
 
@@ -105,14 +107,14 @@ export function Hero() {
         >
           <ul className="flex items-center gap-3">
             {socials.map((social) => (
-              <li key={social.label}>
+              <li key={social.id}>
                 <a
-                  href={social.href}
+                  href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="grid h-10 w-10 place-items-center rounded-full border border-border text-muted transition-colors duration-200 hover:border-fg/30 hover:text-fg"
                 >
-                  <Icon name={social.icon} className="h-4 w-4" title={social.label} />
+                  <Icon name={socialIcon(social.icon)} className="h-4 w-4" title={social.label} />
                 </a>
               </li>
             ))}
@@ -120,7 +122,7 @@ export function Hero() {
 
           <dl className="flex items-center gap-8">
             {stats.map((stat) => (
-              <div key={stat.label}>
+              <div key={stat.id}>
                 <dt className="sr-only">{stat.label}</dt>
                 <dd>
                   <span className="block font-display text-2xl leading-none">{stat.value}</span>

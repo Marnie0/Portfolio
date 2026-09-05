@@ -1,9 +1,15 @@
 import { Section, SectionHeading } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
 import { SkillCard } from '@/components/ui/SkillCard';
-import { skillGroups, spokenLanguages } from '@/lib/content';
+import { getSkillGroups, getSpokenLanguages } from '@/lib/content-db/skills';
 
-export function Skills() {
+export async function Skills() {
+  // Both lists are independent, so fetch them together rather than in series.
+  const [skillGroups, spokenLanguages] = await Promise.all([
+    getSkillGroups(),
+    getSpokenLanguages(),
+  ]);
+
   return (
     <Section id="skills">
       <SectionHeading

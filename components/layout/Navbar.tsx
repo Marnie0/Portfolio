@@ -5,9 +5,15 @@ import { usePathname } from 'next/navigation';
 import { m, useScroll, useSpring } from 'framer-motion';
 import { Icon } from '@/components/ui/Icon';
 import { ThemeToggle } from './ThemeToggle';
-import { initials, navLinks, siteConfig } from '@/lib/site';
+import { navLinks } from '@/lib/site';
 
-export function Navbar() {
+type NavbarProps = {
+  /** Passed down from the layout: this is a client component and cannot query. */
+  initials: string;
+  shortName: string;
+};
+
+export function Navbar({ initials, shortName }: NavbarProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -115,7 +121,7 @@ export function Navbar() {
           >
             {initials}
           </span>
-          <span className="sr-only sm:not-sr-only">{siteConfig.shortName}</span>
+          <span className="sr-only sm:not-sr-only">{shortName}</span>
         </a>
 
         <ul className="hidden items-center gap-1 lg:flex">

@@ -228,3 +228,288 @@ export async function saveEducation(
   revalidateContent('education');
   redirect('/admin/education');
 }
+
+/* ------------------------------- services -------------------------------- */
+
+export async function saveService(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+
+  const id = String(formData.get('id') ?? '').trim();
+  const title = String(formData.get('title') ?? '').trim();
+  const description = String(formData.get('description') ?? '').trim();
+  const deliverables = parseLines(formData.get('deliverables'));
+  const icon = String(formData.get('icon') ?? 'code').trim();
+  const visible = formData.get('visible') === 'on';
+
+  if (!title) return { error: 'Title is required.' };
+
+  const values = { title, description, deliverables, icon, visible };
+
+  if (id) {
+    const { error } = await supabase.from('services').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'services');
+    const { error } = await supabase.from('services').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('services');
+  redirect('/admin/services');
+}
+
+/* -------------------------------- skills --------------------------------- */
+
+export async function saveSkillGroup(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+
+  const id = String(formData.get('id') ?? '').trim();
+  const title = String(formData.get('title') ?? '').trim();
+  const skills = parseLines(formData.get('skills'));
+  const visible = formData.get('visible') === 'on';
+
+  if (!title) return { error: 'Group title is required.' };
+
+  const values = { title, skills, visible };
+
+  if (id) {
+    const { error } = await supabase.from('skill_groups').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'skill_groups');
+    const { error } = await supabase.from('skill_groups').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('skill_groups');
+  redirect('/admin/skills');
+}
+
+export async function saveLanguage(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+
+  const id = String(formData.get('id') ?? '').trim();
+  const name = String(formData.get('name') ?? '').trim();
+  const level = String(formData.get('level') ?? '').trim();
+  const visible = formData.get('visible') === 'on';
+
+  if (!name) return { error: 'Language name is required.' };
+  if (!level) return { error: 'Level is required.' };
+
+  const values = { name, level, visible };
+
+  if (id) {
+    const { error } = await supabase.from('spoken_languages').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'spoken_languages');
+    const { error } = await supabase.from('spoken_languages').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('spoken_languages');
+  redirect('/admin/skills');
+}
+
+/* ------------------------------- projects -------------------------------- */
+
+export async function saveProject(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+
+  const id = String(formData.get('id') ?? '').trim();
+  const title = String(formData.get('title') ?? '').trim();
+  const category = String(formData.get('category') ?? '').trim();
+  const year = String(formData.get('year') ?? '').trim();
+  const summary = String(formData.get('summary') ?? '').trim();
+  const focus = String(formData.get('focus') ?? '').trim();
+  const tech = parseLines(formData.get('tech'));
+  const imageUrl = String(formData.get('image_url') ?? '').trim();
+  const imageAlt = String(formData.get('image_alt') ?? '').trim();
+  const liveUrl = String(formData.get('live_url') ?? '').trim();
+  const githubUrl = String(formData.get('github_url') ?? '').trim();
+  const featured = formData.get('featured') === 'on';
+  const visible = formData.get('visible') === 'on';
+
+  if (!title) return { error: 'Title is required.' };
+  if (imageUrl && !imageAlt) {
+    return { error: 'Alt text is required when there is a cover image.' };
+  }
+
+  const values = {
+    title,
+    category,
+    year,
+    summary,
+    focus,
+    tech,
+    // Nullable so the components can branch on "no image" / "no link".
+    image_url: imageUrl || null,
+    image_alt: imageAlt,
+    live_url: liveUrl || null,
+    github_url: githubUrl || null,
+    featured,
+    visible,
+  };
+
+  if (id) {
+    const { error } = await supabase.from('projects').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'projects');
+    const { error } = await supabase.from('projects').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('projects');
+  redirect('/admin/projects');
+}
+
+/* ------------------------- site settings (singleton) --------------------- */
+
+const SETTINGS_TEXT_FIELDS = [
+  'name',
+  'short_name',
+  'role',
+  'tagline',
+  'description',
+  'location',
+  'availability',
+  'email',
+  'phone_display',
+  'phone_tel',
+  'whatsapp_url',
+  'resume_url',
+  'hero_cta_primary',
+  'hero_cta_secondary',
+  'hero_resume_label',
+  'about_eyebrow',
+  'about_lead',
+  'contact_eyebrow',
+  'contact_title',
+  'contact_description',
+] as const;
+
+export async function saveSiteSettings(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+
+  const values: Record<string, unknown> = {};
+  for (const field of SETTINGS_TEXT_FIELDS) {
+    values[field] = String(formData.get(field) ?? '').trim();
+  }
+  values.about_paragraphs = parseLines(formData.get('about_paragraphs'));
+
+  if (!values.name) return { error: 'Name is required — it is the site heading.' };
+  if (!values.email) return { error: 'Email is required.' };
+
+  // The row is created by the seed, but upsert keeps this working on a fresh
+  // database where nobody has run it yet.
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ id: 1, ...values }, { onConflict: 'id' });
+
+  if (error) return { error: `Could not save: ${error.message}` };
+
+  revalidatePath('/');
+  revalidatePath('/admin/site');
+  redirect('/admin/site');
+}
+
+export async function saveAboutFact(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+  const id = String(formData.get('id') ?? '').trim();
+  const label = String(formData.get('label') ?? '').trim();
+  const entries = parseLines(formData.get('entries'));
+  const visible = formData.get('visible') === 'on';
+
+  if (!label) return { error: 'Label is required.' };
+  if (entries.length === 0) return { error: 'Add at least one line.' };
+
+  const values = { label, entries, visible };
+
+  if (id) {
+    const { error } = await supabase.from('about_facts').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'about_facts');
+    const { error } = await supabase.from('about_facts').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('about_facts');
+  redirect('/admin/site');
+}
+
+export async function saveHeroStat(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+  const id = String(formData.get('id') ?? '').trim();
+  const value = String(formData.get('value') ?? '').trim();
+  const label = String(formData.get('label') ?? '').trim();
+  const visible = formData.get('visible') === 'on';
+
+  if (!value || !label) return { error: 'Both the number and the label are required.' };
+
+  const values = { value, label, visible };
+
+  if (id) {
+    const { error } = await supabase.from('hero_stats').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'hero_stats');
+    const { error } = await supabase.from('hero_stats').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('hero_stats');
+  redirect('/admin/site');
+}
+
+export async function saveSocialLink(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+  const id = String(formData.get('id') ?? '').trim();
+  const label = String(formData.get('label') ?? '').trim();
+  const url = String(formData.get('url') ?? '').trim();
+  const icon = String(formData.get('icon') ?? 'external').trim();
+  const display = String(formData.get('display') ?? '').trim();
+  const visible = formData.get('visible') === 'on';
+
+  if (!label) return { error: 'Label is required.' };
+  if (!url) return { error: 'URL is required.' };
+
+  const values = { label, url, icon, display, visible };
+
+  if (id) {
+    const { error } = await supabase.from('social_links').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'social_links');
+    const { error } = await supabase.from('social_links').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('social_links');
+  redirect('/admin/site');
+}

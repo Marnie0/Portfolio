@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { Section, SectionHeading } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
 import { Icon } from '@/components/ui/Icon';
-import { projects, type Project } from '@/lib/content';
+import { getProjects, type Project } from '@/lib/content-db/projects';
 import { siteConfig } from '@/lib/site';
 
 /* ------------------------------- shared bits ------------------------------ */
@@ -36,9 +36,9 @@ function FocusBlock({ focus }: { focus: string }) {
 function ProjectLinks({ project }: { project: Project }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {project.links.live && (
+      {project.live_url && (
         <a
-          href={project.links.live}
+          href={project.live_url}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`View the live ${project.title} site (opens in a new tab)`}
@@ -51,9 +51,9 @@ function ProjectLinks({ project }: { project: Project }) {
           />
         </a>
       )}
-      {project.links.github && (
+      {project.github_url && (
         <a
-          href={project.links.github}
+          href={project.github_url}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`View the ${project.title} source on GitHub (opens in a new tab)`}
@@ -70,14 +70,19 @@ function ProjectLinks({ project }: { project: Project }) {
 function ProjectImage({ project, sizes }: { project: Project; sizes: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border bg-surface-muted">
-      <Image
-        src={project.image}
-        alt={project.imageAlt}
-        width={1600}
-        height={1000}
-        sizes={sizes}
-        className="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03]"
-      />
+      {project.image_url ? (
+        <Image
+          src={project.image_url}
+          alt={project.image_alt}
+          width={1600}
+          height={1000}
+          sizes={sizes}
+          className="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03]"
+        />
+      ) : (
+        // No image yet: keep the card's shape instead of collapsing the layout.
+        <div aria-hidden className="aspect-[16/10] w-full" />
+      )}
     </div>
   );
 }
@@ -165,7 +170,8 @@ function ProjectCard({ project, delay }: { project: Project; delay: number }) {
 
 /* -------------------------------- section --------------------------------- */
 
-export function Projects() {
+export async function Projects() {
+  const projects = await getProjects();
   const featured = projects.filter((project) => project.featured);
   const rest = projects.filter((project) => !project.featured);
 

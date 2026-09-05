@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { siteConfig } from '@/lib/site';
+import { getSiteSettings } from '@/lib/content-db/settings';
 
 /**
  * Contact endpoint — delivers submissions by email through Resend.
@@ -28,8 +29,21 @@ const envOr = (value: string | undefined, fallback: string) => {
   return trimmed ? trimmed : fallback;
 };
 
-/** Where enquiries land. Defaults to the address in the site config. */
-const TO_ADDRESS = envOr(process.env.CONTACT_TO_EMAIL, siteConfig.email);
+/**
+ * Where enquiries land.
+ *
+ * CONTACT_TO_EMAIL still wins, so delivery can be redirected without touching
+ * the database. Otherwise the address you set in the admin is used, falling
+ * back to the compiled config if Supabase is unreachable — the form must keep
+ * working during an outage.
+ */
+async function resolveToAddress(): Promise<string> {
+  const fromEnv = process.env.CONTACT_TO_EMAIL?.trim();
+  if (fromEnv) return fromEnv;
+
+  const settings = await getSiteSettings();
+  return settings.email || siteConfig.email;
+}
 
 /**
  * Resend's shared sender works with no domain setup, but can only deliver to
@@ -101,6 +115,8 @@ export async function POST(request: Request) {
     );
   }
 
+  const toAddress = await resolveToAddress();
+
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.6;color:#14110e">
       <h2 style="margin:0 0 16px">New portfolio enquiry</h2>
@@ -132,7 +148,7 @@ ${message}
       },
       body: JSON.stringify({
         from: FROM_ADDRESS,
-        to: [TO_ADDRESS],
+        to: [toAddress],
         // Replying in the mail client goes straight back to the sender.
         reply_to: email,
         subject: `Portfolio enquiry from ${name}`,

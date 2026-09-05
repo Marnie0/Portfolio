@@ -1,9 +1,11 @@
 import { Section, SectionHeading } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
 import { Icon } from '@/components/ui/Icon';
-import { services } from '@/lib/content';
+import { getServices, serviceIcon } from '@/lib/content-db/services';
 
-export function Services() {
+export async function Services() {
+  const services = await getServices();
+
   return (
     <Section id="services" className="bg-surface-muted/40">
       <SectionHeading
@@ -24,7 +26,7 @@ export function Services() {
               />
 
               <span className="inline-grid h-11 w-11 place-items-center rounded-xl border border-border bg-accent-soft text-accent-text">
-                <Icon name={service.icon} className="h-5 w-5" />
+                <Icon name={serviceIcon(service.icon)} className="h-5 w-5" />
               </span>
 
               <h3 className="mt-5 font-display text-xl leading-snug">{service.title}</h3>
