@@ -2,8 +2,12 @@
  * Last-resort site URL, used when NEXT_PUBLIC_SITE_URL is absent or unusable.
  * It only has to be a *parseable* absolute URL so `new URL()` cannot throw
  * during the build; the real value is set per environment.
+ *
+ * example.com is reserved by IANA (RFC 2606) and can never belong to anyone,
+ * so if this ever leaks into a canonical tag or sitemap it points nowhere
+ * rather than at a stranger's site.
  */
-const FALLBACK_SITE_URL = 'https://placeholder.vercel.app';
+const FALLBACK_SITE_URL = 'https://example.com';
 
 /**
  * Resolves the public site URL, never throwing.
