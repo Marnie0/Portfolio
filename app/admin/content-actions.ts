@@ -50,6 +50,35 @@ function revalidateContent(table: EditableTable) {
   revalidatePath(`/admin/${table}`);
 }
 
+
+/**
+ * Turns a textarea into a Postgres text[].
+ *
+ * List fields (highlights, deliverables, skills, tech) are edited one item per
+ * line, which is far easier on a phone than a repeating field widget. Blank
+ * lines are dropped so a trailing newline cannot create an empty chip.
+ */
+function parseLines(value: FormDataEntryValue | null): string[] {
+  return String(value ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+/** New rows go to the end of their section. */
+async function nextSortOrder(
+  supabase: Awaited<ReturnType<typeof createServerSupabase>>,
+  table: EditableTable,
+): Promise<number> {
+  const { data } = await supabase
+    .from(table)
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data?.sort_order ?? 0) + 1;
+}
+
 export type ActionState = { error: string } | null;
 
 /* ----------------------------- shared actions ---------------------------- */
@@ -146,20 +175,56 @@ export async function saveAchievement(
     const { error } = await supabase.from('achievements').update(values).eq('id', id);
     if (error) return { error: `Could not save: ${error.message}` };
   } else {
-    // New rows go to the end of the list.
-    const { data: last } = await supabase
-      .from('achievements')
-      .select('sort_order')
-      .order('sort_order', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const { error } = await supabase
-      .from('achievements')
-      .insert({ ...values, sort_order: (last?.sort_order ?? 0) + 1 });
+    const sort_order = await nextSortOrder(supabase, 'achievements');
+    const { error } = await supabase.from('achievements').insert({ ...values, sort_order });
     if (error) return { error: `Could not create: ${error.message}` };
   }
 
   revalidateContent('achievements');
   redirect('/admin/achievements');
+}
+
+/* ------------------------------ education -------------------------------- */
+
+export async function saveEducation(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const supabase = await requireAdmin();
+
+  const id = String(formData.get('id') ?? '').trim();
+  const degree = String(formData.get('degree') ?? '').trim();
+  const institution = String(formData.get('institution') ?? '').trim();
+  const period = String(formData.get('period') ?? '').trim();
+  const location = String(formData.get('location') ?? '').trim();
+  const description = String(formData.get('description') ?? '').trim();
+  const highlights = parseLines(formData.get('highlights'));
+  const visible = formData.get('visible') === 'on';
+
+  if (!degree) return { error: 'Degree or title is required.' };
+  if (!institution) return { error: 'Institution is required.' };
+  if (!period) return { error: 'Period is required.' };
+
+  const values = {
+    degree,
+    institution,
+    period,
+    // The column is nullable and the design omits the line entirely when empty.
+    location: location || null,
+    description,
+    highlights,
+    visible,
+  };
+
+  if (id) {
+    const { error } = await supabase.from('education').update(values).eq('id', id);
+    if (error) return { error: `Could not save: ${error.message}` };
+  } else {
+    const sort_order = await nextSortOrder(supabase, 'education');
+    const { error } = await supabase.from('education').insert({ ...values, sort_order });
+    if (error) return { error: `Could not create: ${error.message}` };
+  }
+
+  revalidateContent('education');
+  redirect('/admin/education');
 }

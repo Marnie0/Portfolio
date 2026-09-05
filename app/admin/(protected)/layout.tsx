@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 const adminSections = [
   { href: '/admin', label: 'Articles' },
   { href: '/admin/achievements', label: 'Achievements' },
+  { href: '/admin/education', label: 'Education' },
 ] as const;
 
 /** Never cache the admin area — it is per-session by definition. */

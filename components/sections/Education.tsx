@@ -1,8 +1,10 @@
 import { Section, SectionHeading } from '@/components/ui/Section';
 import { Reveal } from '@/components/ui/Reveal';
-import { education } from '@/lib/content';
+import { getEducation } from '@/lib/content-db/education';
 
-export function Education() {
+export async function Education() {
+  const education = await getEducation();
+
   return (
     <Section id="education" className="bg-surface-muted/40">
       <SectionHeading
