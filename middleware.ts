@@ -14,10 +14,17 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLoginPage = pathname === '/admin/login';
 
-  // Without credentials there is no way to authenticate anyone. Let the request
-  // through so the page can explain the misconfiguration rather than redirect
-  // endlessly between two pages that both cannot work.
-  if (!isSupabaseConfigured) return NextResponse.next({ request });
+  // Without credentials there is no way to authenticate anyone, and building a
+  // client from empty strings throws. Send every admin route to the login page,
+  // which renders a "not configured" notice instead of a 500. The login page
+  // itself passes through, so this cannot loop.
+  if (!isSupabaseConfigured) {
+    if (isLoginPage) return NextResponse.next({ request });
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/admin/login';
+    redirectUrl.search = '';
+    return NextResponse.redirect(redirectUrl);
+  }
 
   let response = NextResponse.next({ request });
 

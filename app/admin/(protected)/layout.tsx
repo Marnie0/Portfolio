@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { createServerSupabase } from '@/lib/supabase/server';
 import { signOut } from '../actions';
 
@@ -37,6 +38,11 @@ export default async function ProtectedAdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // The middleware already redirects when Supabase is unconfigured; repeating
+  // the check keeps this layout from constructing a client out of empty
+  // strings if the matcher is ever changed.
+  if (!isSupabaseConfigured) redirect('/admin/login');
+
   const supabase = await createServerSupabase();
   const {
     data: { user },
