@@ -58,7 +58,12 @@ export default async function ArticlesPage() {
                   )}
 
                   <div className="flex flex-1 flex-col p-6">
-                    <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted">
+                    <p className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-muted">
+                      {article.pinned && (
+                        <span className="rounded-full bg-accent px-2 py-0.5 text-[0.65rem] font-semibold tracking-wide text-accent-fg">
+                          Pinned
+                        </span>
+                      )}
                       {formatArticleDate(article.published_at ?? article.created_at)}
                     </p>
 

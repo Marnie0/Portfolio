@@ -151,6 +151,32 @@ export async function togglePublished(formData: FormData): Promise<void> {
   revalidateArticle(article?.slug);
 }
 
+/**
+ * Pins or unpins an article. Pinned articles sort above everything else in the
+ * public list, regardless of date.
+ */
+export async function togglePinned(formData: FormData): Promise<void> {
+  const supabase = await requireAdmin();
+  const id = String(formData.get('id') ?? '').trim();
+  const next = formData.get('next') === 'true';
+  if (!id) return;
+
+  const { data: article } = await supabase
+    .from('articles')
+    .select('slug')
+    .eq('id', id)
+    .maybeSingle();
+
+  const { error } = await supabase.from('articles').update({ pinned: next }).eq('id', id);
+
+  if (error) {
+    console.error('[admin] Failed to change pinned state:', error.message);
+    return;
+  }
+
+  revalidateArticle(article?.slug);
+}
+
 export async function signOut(): Promise<void> {
   const supabase = await createServerSupabase();
   await supabase.auth.signOut();

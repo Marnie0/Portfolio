@@ -258,7 +258,7 @@ which is why the DEPI entry has no location row.
 **A: 🟢 `/admin` → New article.** The feature already exists and is complete.
 
 **Table:** `public.articles` — `title`, `slug` (**UNIQUE**), `excerpt`,
-`content` (Markdown), `cover_image_url`, `published`, `published_at`.
+`content` (Markdown), `cover_image_url`, `published`, `pinned`, `published_at`.
 **Written by:** `saveArticle()` — `app/admin/actions.ts:35`.
 **Rendered by:** `app/articles/page.tsx` and `app/articles/[slug]/page.tsx`.
 
@@ -272,6 +272,11 @@ which is why the DEPI entry has no location row.
   deliberately not enabled in `components/articles/Markdown.tsx`.
 - `published_at` is stamped on first publish and **preserved** on later edits, so
   editing a live post does not jump it to the top.
+- **Pin/Unpin** (`/admin`) sorts an article above all others in the public list
+  regardless of date, and shows a "Pinned" badge on both the admin row and the
+  public card. Column `articles.pinned`; action `togglePinned()` in
+  `app/admin/actions.ts`. Several articles can be pinned at once — they sort
+  among themselves by date.
 
 ---
 

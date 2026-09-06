@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createServerSupabase } from '@/lib/supabase/server';
-import { formatArticleDate, type ArticleSummary } from '@/lib/articles';
-import { deleteArticle, togglePublished } from '../actions';
+import { SUMMARY_COLUMNS, formatArticleDate, type ArticleSummary } from '@/lib/articles';
+import { deleteArticle, togglePinned, togglePublished } from '../actions';
 import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +10,28 @@ export default async function AdminDashboardPage() {
   const supabase = await createServerSupabase();
 
   // The "admin reads all articles" policy lets a signed-in user see drafts too.
-  const { data, error } = await supabase
+  // Pinned first here too, so the admin list matches what visitors see.
+  const withPin = await supabase
     .from('articles')
-    .select('id,title,slug,excerpt,cover_image_url,published,published_at,created_at,updated_at')
+    .select(SUMMARY_COLUMNS)
+    .order('pinned', { ascending: false })
     .order('created_at', { ascending: false });
 
-  const articles = (data ?? []) as ArticleSummary[];
+  // Falls back to the pre-migration column set, so the dashboard still loads if
+  // supabase/07_article_pin.sql has not been run yet.
+  const result = withPin.error?.message.includes('pinned')
+    ? await supabase
+        .from('articles')
+        .select(SUMMARY_COLUMNS.replace(',pinned', ''))
+        .order('created_at', { ascending: false })
+    : withPin;
+
+  const error = result.error;
+
+  const articles = ((result.data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+    pinned: false,
+    ...row,
+  })) as unknown as ArticleSummary[];
 
   return (
     <div className="mt-8">
@@ -61,6 +77,11 @@ export default async function AdminDashboardPage() {
                     >
                       {article.published ? 'Published' : 'Draft'}
                     </span>
+                    {article.pinned && (
+                      <span className="rounded-full bg-accent px-2.5 py-0.5 text-[0.7rem] font-medium uppercase tracking-wide text-accent-fg">
+                        Pinned
+                      </span>
+                    )}
                     <span className="font-mono text-xs text-muted">
                       {formatArticleDate(article.published_at ?? article.created_at)}
                     </span>
@@ -72,6 +93,17 @@ export default async function AdminDashboardPage() {
 
                 {/* Wraps under the title on narrow screens rather than squashing. */}
                 <div className="flex flex-wrap items-center gap-2">
+                  <form action={togglePinned}>
+                    <input type="hidden" name="id" value={article.id} />
+                    <input type="hidden" name="next" value={String(!article.pinned)} />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-border px-3.5 py-2 text-sm text-fg transition-colors hover:bg-surface-muted"
+                    >
+                      {article.pinned ? 'Unpin' : 'Pin'}
+                    </button>
+                  </form>
+
                   <form action={togglePublished}>
                     <input type="hidden" name="id" value={article.id} />
                     <input type="hidden" name="next" value={String(!article.published)} />

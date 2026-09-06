@@ -202,6 +202,10 @@ Unlike the other sections, articles have no fallback copy in the code.
      (tabs on mobile)
 4. **Save as draft** to keep it private, or **Publish** to make it live
 
+**Pinning:** the article list has a **Pin** button. A pinned article sits at the
+top of `/articles` no matter how old it is, with a "Pinned" badge. Pin as many
+as you like — they order among themselves by date. Click **Unpin** to release it.
+
 Drafts are visible only to you. Visitors can't reach them even by guessing the
 URL — the database itself refuses to return unpublished articles.
 

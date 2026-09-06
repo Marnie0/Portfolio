@@ -295,6 +295,7 @@ must run in numeric order:
 04_site_schema.sql  site_settings, about_facts, hero_stats, social_links + RLS
 05_site_seed.sql    settings row + 4 facts + 2 stats + 2 socials
 06_telegram.sql     ALTER TABLE site_settings ADD telegram_url
+07_article_pin.sql  ALTER TABLE articles ADD pinned + articles_pinned_idx
 ```
 
 `00_articles.sql` **must run first** — it defines `public.set_updated_at()`,
@@ -320,13 +321,19 @@ All list tables carry: `id uuid primary key default gen_random_uuid()`,
 | `content` | text | no | `''` |
 | `cover_image_url` | text | yes | |
 | `published` | boolean | no | `false` |
+| `pinned` | boolean | no | `false` |
 | `published_at` | timestamptz | yes | |
 | `created_at` | timestamptz | no | `now()` |
 | `updated_at` | timestamptz | no | `now()` |
 
-Index: `articles_published_idx on (published, published_at desc)`.
-**No `visible` or `sort_order`** — articles order by `published_at desc`, then
-`created_at desc`. Verified by probing the live table.
+Indexes: `articles_published_idx on (published, published_at desc)` and
+`articles_pinned_idx on (published, pinned desc, published_at desc)`.
+**No `visible` or `sort_order`** — articles order by `pinned desc`, then
+`published_at desc`, then `created_at desc`. Verified by probing the live table.
+
+`getPublishedArticles()` and the admin list both **retry without `pinned`** if
+the column is missing, so deploying this build before running
+`07_article_pin.sql` degrades to date ordering instead of emptying the list.
 
 ### `education`
 `degree` text NOT NULL · `institution` text NOT NULL · `period` text NOT NULL ·
@@ -474,6 +481,7 @@ Two `'use server'` files. **Nothing else in the codebase is a Server Action.**
 | `saveArticle` | `(prev: ActionState, fd: FormData) => Promise<ActionState>` | `articles` insert/update | `useActionState` in `ArticleForm.tsx` |
 | `deleteArticle` | `(fd: FormData) => Promise<void>` | `articles` delete | `<form action={deleteArticle}>` in `app/admin/(protected)/page.tsx` |
 | `togglePublished` | `(fd: FormData) => Promise<void>` | `published`, `published_at` | `<form action={togglePublished}>` |
+| `togglePinned` | `(fd: FormData) => Promise<void>` | `articles.pinned` | `<form action={togglePinned}>` in `app/admin/(protected)/page.tsx` |
 | `signOut` | `() => Promise<void>` | auth session | `<form action={signOut}>` in `(protected)/layout.tsx` |
 
 `saveArticle` reads `intent` from the submitter button (`draft` / `publish`) and

@@ -9,6 +9,8 @@ export type Article = {
   content: string;
   cover_image_url: string | null;
   published: boolean;
+  /** Pinned articles sort above everything else in the public list. */
+  pinned: boolean;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -17,8 +19,23 @@ export type Article = {
 /** The subset the listing needs — `content` is large and unused there. */
 export type ArticleSummary = Omit<Article, 'content'>;
 
-const SUMMARY_COLUMNS =
-  'id,title,slug,excerpt,cover_image_url,published,published_at,created_at,updated_at';
+export const SUMMARY_COLUMNS =
+  'id,title,slug,excerpt,cover_image_url,published,pinned,published_at,created_at,updated_at';
+
+/** The same list without `pinned`, used if 07_article_pin.sql has not run yet. */
+const SUMMARY_COLUMNS_NO_PIN = SUMMARY_COLUMNS.replace(',pinned', '');
+
+/**
+ * True when a query failed only because a column this build knows about does
+ * not exist in the database yet. Covers PostgREST's schema-cache wording and
+ * Postgres' own 42703.
+ */
+function isMissingColumn(message: string, column: string): boolean {
+  return (
+    message.includes(`Could not find the '${column}' column`) ||
+    new RegExp(`column [\\w."']*${column}["']? does not exist`).test(message)
+  );
+}
 
 /**
  * Published articles, newest first.
@@ -29,19 +46,38 @@ const SUMMARY_COLUMNS =
 export async function getPublishedArticles(): Promise<ArticleSummary[]> {
   if (!publicSupabase) return [];
 
-  const { data, error } = await publicSupabase
-    .from('articles')
-    .select(SUMMARY_COLUMNS)
-    .eq('published', true)
-    .order('published_at', { ascending: false, nullsFirst: false })
-    .order('created_at', { ascending: false });
+  const client = publicSupabase;
+
+  /** Pinned first, then newest. Ordering is applied in the database. */
+  const query = (columns: string, withPin: boolean) => {
+    let q = client.from('articles').select(columns).eq('published', true);
+    if (withPin) q = q.order('pinned', { ascending: false });
+    return q
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false });
+  };
+
+  let { data, error } = await query(SUMMARY_COLUMNS, true);
+
+  // Deploying this build before running 07_article_pin.sql would otherwise
+  // empty the whole article list. Retry without the column instead.
+  if (error && isMissingColumn(error.message, 'pinned')) {
+    console.warn('[articles] `pinned` column missing — run supabase/07_article_pin.sql');
+    ({ data, error } = await query(SUMMARY_COLUMNS_NO_PIN, false));
+  }
 
   if (error) {
     console.error('[articles] Failed to load published articles:', error.message);
     return [];
   }
 
-  return (data ?? []) as ArticleSummary[];
+  // `pinned` is absent on the fallback path; default it so callers can rely on it.
+  // Cast through `unknown`: the column list is a runtime string, so supabase-js
+  // cannot infer the row shape.
+  return ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+    pinned: false,
+    ...row,
+  })) as unknown as ArticleSummary[];
 }
 
 /** A single published article, or null when it does not exist or is a draft. */
