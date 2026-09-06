@@ -47,6 +47,8 @@ Everything else — including every `components/sections/*.tsx` except
 | `/admin/**` (protected) | **Dynamic (SSR)** | `export const dynamic = 'force-dynamic'` on the layout and every page |
 | `/api/contact` | Dynamic route handler | POST only |
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | Static, generated from `app/sitemap.ts`, `app/robots.ts`, `app/manifest.ts` | |
+| `/opengraph-image` | **Static**, rendered at build by `next/og` `ImageResponse` | `app/opengraph-image.tsx`, 1200×630 PNG |
+| `/_not-found` | Static | `app/not-found.tsx` — also serves `notFound()` from `articles/[slug]` |
 
 The admin is `force-dynamic` because it is per-session by definition; caching it
 would leak one request's data into another's.
@@ -169,6 +171,10 @@ app/                        App Router
   page.tsx                  Home page. revalidate = 60. Composes the sections.
   globals.css               Design tokens + .article-body + highlight.js theme
   robots.ts sitemap.ts manifest.ts icon.svg apple-icon.png
+  opengraph-image.tsx       Social share card. No webfont fetch, no fs read —
+                            both work locally but are the likeliest build-time
+                            failures on Vercel, and this must never break a deploy.
+  not-found.tsx             Custom 404
   articles/page.tsx         Public article list
   articles/[slug]/page.tsx  Public article, generateStaticParams + generateMetadata
   api/contact/route.ts      POST → Resend
