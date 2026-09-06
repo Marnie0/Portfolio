@@ -391,7 +391,7 @@ in numbered order, so the whole database could be rebuilt from scratch.
 | **Write real articles** | The blog works but is currently empty. |
 | **Custom domain** | Optional. If you buy one, add it in Vercel and update `NEXT_PUBLIC_SITE_URL`, then redeploy. |
 | **Verify a domain in Resend** | Until then, contact emails come from a shared address and are more likely to land in spam. |
-| **`npm run lint` is broken** | The script calls ESLint, which isn't installed. Doesn't affect the site at all — only matters if you want linting. |
+| **No code linter set up** | Optional tooling that flags style issues. Not installed, and nothing depends on it. Doesn't affect the site. |
 | **Leftover test image in storage** | An unused uploaded image sits in `content-images`. Harmless; delete via Supabase → Storage if you want. |
 
 ### Known quirks, by design

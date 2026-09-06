@@ -155,8 +155,9 @@ a false success.
   Vercel uses its own default. `@supabase/supabase-js` prints a deprecation
   warning on Node ≤20 — harmless.
 - `sharp 0.33.5` is a direct dependency for image optimisation.
-- **`npm run lint` is broken** — the script is `eslint .` but ESLint is not
-  installed and there is no config. Next skips linting during build as a result.
+- **No linter is configured.** There is no ESLint install and no config, and the
+  `lint` script was removed rather than left failing. Next skips linting during
+  build as a result. Adding ESLint is a clean, self-contained task if wanted.
 
 ---
 
@@ -899,7 +900,7 @@ which column was skipped, only when it actually held a value.
 
 | Item | Impact |
 |---|---|
-| `npm run lint` is broken — `eslint .` with ESLint not installed | No linting. Build unaffected. |
+| No linter configured (no ESLint, no config) | No linting. Build unaffected. |
 | No tests of any kind | Verification is manual + type checking. |
 | Node version not pinned | Local 18, Vercel newer. |
 | Orphaned Storage files on delete | Grows unbounded; files stay public. |
